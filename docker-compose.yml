@@ -1,0 +1,48 @@
+# Ghost Using Docker Compose
+
+# Change variables in the `.env` to meet your requirements.
+# Note that the `.env` file should be in the same directory as `docker-compose.yml`.
+
+# Create networks for your services before deploying the configuration using the commands
+# docker network create ghost-network
+
+# Deploy Ghost using Docker Compose
+# docker-compose -p ghost up -d
+
+# Admin
+# http://localhost:2368/ghost
+
+version: '3.9'
+
+services:
+  blog:
+    image: ghost:latest
+    restart: always
+    ports:
+      - 2368:2368
+    volumes:
+      - ~/data/content:/var/lib/ghost/content
+    environment:
+      # see https://ghost.org/docs/config/#configuration-options
+      database__client: mysql
+      database__connection__host: database
+      database__connection__user: root
+      database__connection__password: strong_password
+      database__connection__database: ghost
+      url: http://localhost:2368
+      # NODE_ENV: production
+    depends_on:
+      - database
+
+  database:
+    image: mariadb:latest
+    restart: always
+    volumes:
+      - ~/data/db:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: strong_password
+      MYSQL_DATABASE: ghost
+      MYSQL_USER: user
+      MYSQL_PASSWORD: strong_password
